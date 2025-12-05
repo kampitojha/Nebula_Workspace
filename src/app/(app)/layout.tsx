@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import Sidebar from "@/components/layout/sidebar"
 import Topbar from "@/components/layout/topbar"
+import PageTransition from "@/components/layout/page-transition"
 
 export default async function AppLayout({
   children,
@@ -36,7 +37,9 @@ export default async function AppLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar user={session.user} />
         <main className="flex-1 overflow-y-auto p-6">
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </main>
       </div>
     </div>

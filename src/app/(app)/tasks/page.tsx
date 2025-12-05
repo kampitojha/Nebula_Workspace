@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Plus, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 interface Task {
   id: string;
@@ -104,17 +105,37 @@ export default function TasksPage() {
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div 
+      className="space-y-6"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={item} className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Tasks</h1>
         <Button onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           New Task
         </Button>
-      </div>
+      </motion.div>
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <motion.div variants={item} className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
@@ -146,64 +167,68 @@ export default function TasksPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {tasks.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="bg-primary/10 p-4 rounded-full mb-4">
-              <CheckCircle className="h-10 w-10 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
-            <p className="text-muted-foreground text-center mb-6 max-w-sm">
-              Track your work by creating tasks. Assign them to projects and team members.
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Task
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div variants={item}>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="bg-primary/10 p-4 rounded-full mb-4">
+                <CheckCircle className="h-10 w-10 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-sm">
+                Track your work by creating tasks. Assign them to projects and team members.
+              </p>
+              <Button onClick={() => setIsCreateOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Task
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       ) : (
-        <div>
+        <motion.div variants={item}>
           <h2 className="text-lg font-semibold mb-4">All Tasks</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {tasks.map((task) => (
               <Link key={task.id} href={`/tasks/${task.id}`}>
-                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="mt-4 text-lg">{task.title}</CardTitle>
-                      <Badge 
-                        variant={task.status === "DONE" ? "default" : "secondary"}
-                        className={task.status === "DONE" ? "bg-green-500 hover:bg-green-600" : ""}
-                      >
-                        {task.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {task.description || "No description provided"}
-                      </p>
-                      <div className="flex items-center justify-between pt-4 border-t">
-                        <span className="text-xs font-medium px-2 py-1 bg-muted rounded-md">
-                          {task.project.name}
-                        </span>
-                        {task.assignee && (
-                          <span className="text-xs text-muted-foreground">
-                            {task.assignee.name}
-                          </span>
-                        )}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Card className="hover:shadow-lg transition-all cursor-pointer h-full group border-primary/10">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="mt-4 text-lg">{task.title}</CardTitle>
+                        <Badge 
+                          variant={task.status === "DONE" ? "default" : "secondary"}
+                          className={task.status === "DONE" ? "bg-green-500 hover:bg-green-600" : ""}
+                        >
+                          {task.status}
+                        </Badge>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {task.description || "No description provided"}
+                        </p>
+                        <div className="flex items-center justify-between pt-4 border-t">
+                          <span className="text-xs font-medium px-2 py-1 bg-muted rounded-md">
+                            {task.project.name}
+                          </span>
+                          {task.assignee && (
+                            <span className="text-xs text-muted-foreground">
+                              {task.assignee.name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </Link>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -254,6 +279,6 @@ export default function TasksPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }

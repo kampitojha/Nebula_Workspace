@@ -13,7 +13,7 @@ const updateTaskSchema = z.object({
 })
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { taskId: string } }
 ) {
   try {
@@ -95,7 +95,16 @@ export async function PATCH(
       return NextResponse.json({ error: "Task not found" }, { status: 404 })
     }
 
-    const updateData: any = { ...validatedData }
+    interface UpdateTaskData {
+      title?: string
+      description?: string
+      status?: "TODO" | "IN_PROGRESS" | "DONE"
+      priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+      dueDate?: string | Date
+      assigneeId?: string | null
+    }
+
+    const updateData: UpdateTaskData = { ...validatedData }
     if (validatedData.dueDate) {
       updateData.dueDate = new Date(validatedData.dueDate)
     }
@@ -125,7 +134,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { taskId: string } }
 ) {
   try {

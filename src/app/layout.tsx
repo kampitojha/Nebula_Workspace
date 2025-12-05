@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 }
 
 import { Providers } from "@/components/providers"
+import StarField from "@/components/3d/star-field"
 
 export default function RootLayout({
   children,
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
+          <StarField />
           {children}
           <Toaster />
         </Providers>

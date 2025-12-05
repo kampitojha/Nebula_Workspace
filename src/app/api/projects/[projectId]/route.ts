@@ -9,7 +9,7 @@ const updateProjectSchema = z.object({
 })
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { projectId: string } }
 ) {
   try {
@@ -122,7 +122,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { projectId: string } }
 ) {
   try {

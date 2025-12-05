@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, FileText, User } from "lucide-react";
 import { toast } from "sonner";
 import Editor from "@/components/ui/editor";
+import { motion } from "framer-motion";
 
 interface Note {
   id: string;
@@ -115,9 +116,29 @@ export default function NotesPage() {
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div 
+      className="space-y-6"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={item} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Notes</h1>
           <p className="text-muted-foreground mt-1">
@@ -128,10 +149,10 @@ export default function NotesPage() {
           <Plus className="mr-2 h-4 w-4" />
           New Note
         </Button>
-      </div>
+      </motion.div>
 
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <motion.div variants={item} className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Notes</CardTitle>
@@ -152,56 +173,60 @@ export default function NotesPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {notes.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="bg-primary/10 p-4 rounded-full mb-4">
-              <FileText className="h-10 w-10 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No notes yet</h3>
-            <p className="text-muted-foreground text-center mb-6 max-w-sm">
-              Capture ideas, meeting minutes, and documentation. Create your first note to get started.
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Note
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div variants={item}>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="bg-primary/10 p-4 rounded-full mb-4">
+                <FileText className="h-10 w-10 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No notes yet</h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-sm">
+                Capture ideas, meeting minutes, and documentation. Create your first note to get started.
+              </p>
+              <Button onClick={() => setIsCreateOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Note
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       ) : (
-        <div>
+        <motion.div variants={item}>
           <h2 className="text-lg font-semibold mb-4">All Notes</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {notes.map((note) => (
               <Link key={note.id} href={`/notes/${note.id}`}>
-                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
-                        <FileText className="h-6 w-6 text-primary" />
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Card className="hover:shadow-lg transition-all cursor-pointer h-full group border-primary/10">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
+                          <FileText className="h-6 w-6 text-primary" />
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(note.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(note.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <CardTitle className="mt-4 line-clamp-1">{note.title}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      Project: {note.project.name}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <User className="mr-2 h-4 w-4" />
-                      Created by {note.createdBy.name}
-                    </div>
-                  </CardContent>
-                </Card>
+                      <CardTitle className="mt-4 line-clamp-1">{note.title}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        Project: {note.project.name}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <User className="mr-2 h-4 w-4" />
+                        Created by {note.createdBy.name}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </Link>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -256,6 +281,6 @@ export default function NotesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }

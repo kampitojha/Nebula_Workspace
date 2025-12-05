@@ -7,7 +7,7 @@ const createWorkspaceSchema = z.object({
   name: z.string().min(2, "Workspace name must be at least 2 characters"),
 })
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user) {

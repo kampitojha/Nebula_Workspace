@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Plus, FolderKanban, User } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 interface Project {
   id: string;
@@ -90,9 +91,29 @@ export default function ProjectsPage() {
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div 
+      className="space-y-6"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={item} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Projects</h1>
           <p className="text-muted-foreground mt-1">Manage your workspace projects</p>
@@ -101,10 +122,10 @@ export default function ProjectsPage() {
           <Plus className="mr-2 h-4 w-4" />
           New Project
         </Button>
-      </div>
+      </motion.div>
 
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <motion.div variants={item} className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
@@ -134,54 +155,58 @@ export default function ProjectsPage() {
             <div className="text-2xl font-bold">1</div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {projects.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="bg-primary/10 p-4 rounded-full mb-4">
-              <FolderKanban className="h-10 w-10 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
-            <p className="text-muted-foreground text-center mb-6 max-w-sm">
-              Projects help you organize tasks, notes, and team members. Create your first project to get started.
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Project
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div variants={item}>
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="bg-primary/10 p-4 rounded-full mb-4">
+                <FolderKanban className="h-10 w-10 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+              <p className="text-muted-foreground text-center mb-6 max-w-sm">
+                Projects help you organize tasks, notes, and team members. Create your first project to get started.
+              </p>
+              <Button onClick={() => setIsCreateOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Project
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       ) : (
-        <div>
+        <motion.div variants={item}>
           <h2 className="text-lg font-semibold mb-4">All Projects</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
               <Link key={project.id} href={`/projects/${project.id}`}>
-                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
-                        <FolderKanban className="h-6 w-6 text-primary" />
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Card className="hover:shadow-lg transition-all cursor-pointer h-full group border-primary/10">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
+                          <FolderKanban className="h-6 w-6 text-primary" />
+                        </div>
+                        <Badge variant="secondary">{project._count.tasks} tasks</Badge>
                       </div>
-                      <Badge variant="secondary">{project._count.tasks} tasks</Badge>
-                    </div>
-                    <CardTitle className="mt-4">{project.name}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {project.description || "No description provided"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <User className="mr-2 h-4 w-4" />
-                      Created by {project.createdBy.name}
-                    </div>
-                  </CardContent>
-                </Card>
+                      <CardTitle className="mt-4">{project.name}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {project.description || "No description provided"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <User className="mr-2 h-4 w-4" />
+                        Created by {project.createdBy.name}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </Link>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -220,6 +245,6 @@ export default function ProjectsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }
