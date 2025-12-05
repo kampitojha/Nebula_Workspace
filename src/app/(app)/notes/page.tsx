@@ -1,108 +1,118 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, FileText, User } from "lucide-react"
-import { toast } from "sonner"
-import Editor from "@/components/ui/editor"
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, FileText, User } from "lucide-react";
+import { toast } from "sonner";
+import Editor from "@/components/ui/editor";
 
 interface Note {
-  id: string
-  title: string
-  content: string
-  createdAt: string
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
   createdBy: {
-    name: string | null
-  }
+    name: string | null;
+  };
   project: {
-    name: string
-  }
+    name: string;
+  };
 }
 
 interface Project {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 export default function NotesPage() {
-  const searchParams = useSearchParams()
-  const workspaceId = searchParams.get("workspace")
+  const searchParams = useSearchParams();
+  const workspaceId = searchParams.get("workspace");
   
-  const [notes, setNotes] = useState<Note[]>([])
-  const [projects, setProjects] = useState<Project[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newNote, setNewNote] = useState({
     title: "",
     content: "",
     projectId: "",
-  })
+  });
 
   useEffect(() => {
     if (workspaceId) {
-      fetchData()
+      fetchData();
     }
-  }, [workspaceId])
+  }, [workspaceId]);
+
+  if (!workspaceId) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <p className="text-muted-foreground">Workspace not specified. Please select a workspace.</p>
+      </div>
+    );
+  }
 
   const fetchData = async () => {
     try {
       const [notesRes, projectsRes] = await Promise.all([
-        fetch(`/api/notes?workspaceId=${workspaceId}`), // Note: API needs update to support workspace filter or we filter client side if needed, but ideally API
+        fetch(`/api/notes?workspaceId=${workspaceId}`),
         fetch(`/api/projects?workspaceId=${workspaceId}`)
-      ])
+      ]);
 
       if (notesRes.ok && projectsRes.ok) {
-        const notesData = await notesRes.json()
-        const projectsData = await projectsRes.json()
-        setNotes(notesData.notes)
-        setProjects(projectsData.projects)
+        const notesData = await notesRes.json();
+        const projectsData = await projectsRes.json();
+        setNotes(notesData.notes);
+        setProjects(projectsData.projects);
+      } else {
+        toast.error("Failed to load data");
       }
     } catch (error) {
-      toast.error("Failed to load data")
+      toast.error("Failed to load data");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleCreateNote = async () => {
     if (!newNote.title.trim() || !newNote.projectId) {
-      toast.error("Title and Project are required")
-      return
+      toast.error("Title and Project are required");
+      return;
     }
 
     try {
       const response = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newNote),
-      })
+        body: JSON.stringify({ ...newNote, workspaceId }),
+      });
 
       if (response.ok) {
-        toast.success("Note created successfully!")
-        setIsCreateOpen(false)
-        setNewNote({ title: "", content: "", projectId: "" })
-        fetchData()
+        toast.success("Note created successfully!");
+        setIsCreateOpen(false);
+        setNewNote({ title: "", content: "", projectId: "" });
+        fetchData();
       } else {
-        toast.error("Failed to create note")
+        toast.error("Failed to create note");
       }
     } catch (error) {
-      toast.error("Something went wrong")
+      toast.error("Something went wrong");
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
         <p className="text-muted-foreground">Loading notes...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -210,5 +220,5 @@ export default function NotesPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

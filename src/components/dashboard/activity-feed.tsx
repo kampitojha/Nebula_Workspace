@@ -8,10 +8,11 @@ import { Activity as ActivityIcon } from "lucide-react"
 
 interface Activity {
   id: string
-  action: string
-  entityType: string
+  type: string
+  description: string
+  targetType: string | null
   createdAt: string
-  user: {
+  actor: {
     name: string | null
     image: string | null
   }
@@ -26,24 +27,26 @@ export default function ActivityFeed({ workspaceId }: ActivityFeedProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (workspaceId) {
-      fetchActivities()
-    }
-  }, [workspaceId])
-
-  const fetchActivities = async () => {
-    try {
-      const response = await fetch(`/api/activity?workspaceId=${workspaceId}`)
-      if (response.ok) {
-        const data = await response.json()
-        setActivities(data.activities)
+    const fetchActivities = async () => {
+      try {
+        const url = workspaceId 
+          ? `/api/activity?workspaceId=${workspaceId}` 
+          : `/api/activity`
+        
+        const response = await fetch(url)
+        if (response.ok) {
+          const data = await response.json()
+          setActivities(data.activities)
+        }
+      } catch (error) {
+        console.error("Failed to load activities")
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Failed to load activities")
-    } finally {
-      setIsLoading(false)
     }
-  }
+
+    fetchActivities()
+  }, [workspaceId])
 
   if (isLoading) {
     return <div className="text-sm text-muted-foreground">Loading activity...</div>
@@ -64,14 +67,14 @@ export default function ActivityFeed({ workspaceId }: ActivityFeedProps) {
         {activities.map((activity) => (
           <div key={activity.id} className="flex items-start gap-3">
             <Avatar className="h-8 w-8 mt-0.5">
-              <AvatarImage src={activity.user.image || ""} />
-              <AvatarFallback>{activity.user.name?.[0] || "?"}</AvatarFallback>
+              <AvatarImage src={activity.actor.image || ""} />
+              <AvatarFallback>{activity.actor.name?.[0] || "?"}</AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-1">
               <p className="text-sm">
-                <span className="font-medium">{activity.user.name}</span>{" "}
+                <span className="font-medium">{activity.actor.name}</span>{" "}
                 <span className="text-muted-foreground">
-                  {activity.action.toLowerCase()} {activity.entityType.toLowerCase()}
+                  {activity.description}
                 </span>
               </p>
               <p className="text-xs text-muted-foreground">

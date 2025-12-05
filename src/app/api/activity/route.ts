@@ -12,26 +12,36 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const workspaceId = searchParams.get("workspaceId")
 
-    if (!workspaceId) {
-      return NextResponse.json({ error: "Workspace ID required" }, { status: 400 })
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let whereClause: any = {}
 
-    // Check access
-    const member = await db.workspaceMember.findFirst({
-      where: {
-        workspaceId,
-        userId: session.user.id,
-      },
-    })
+    if (workspaceId) {
+      // Check access to specific workspace
+      const member = await db.workspaceMember.findFirst({
+        where: {
+          workspaceId,
+          userId: session.user.id,
+        },
+      })
 
-    if (!member) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 })
+      if (!member) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 })
+      }
+      whereClause = { workspaceId }
+    } else {
+      // Get all workspaces for user
+      const memberships = await db.workspaceMember.findMany({
+        where: { userId: session.user.id },
+        select: { workspaceId: true },
+      })
+      const workspaceIds = memberships.map((m) => m.workspaceId)
+      whereClause = { workspaceId: { in: workspaceIds } }
     }
 
     const activities = await db.activityLog.findMany({
-      where: { workspaceId },
+      where: whereClause,
       include: {
-        user: {
+        actor: {
           select: {
             id: true,
             name: true,
@@ -40,7 +50,7 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: { createdAt: "desc" },
-      take: 20, // Limit to last 20 activities
+      take: 20,
     })
 
     return NextResponse.json({ activities })

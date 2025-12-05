@@ -18,9 +18,12 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const projectId = searchParams.get("projectId")
+    const workspaceId = searchParams.get("workspaceId")
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {}
     if (projectId) where.projectId = projectId
+    if (workspaceId) where.project = { workspaceId }
 
     const notes = await db.note.findMany({
       where,

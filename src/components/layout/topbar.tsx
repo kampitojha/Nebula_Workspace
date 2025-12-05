@@ -12,7 +12,8 @@ import {
 import Notifications from "@/components/layout/notifications"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogOut, User } from "lucide-react"
+import { LogOut, User, CreditCard, Settings, Users } from "lucide-react"
+import Link from "next/link"
 import { signOut } from "next-auth/react"
 
 interface TopbarProps {
@@ -61,13 +62,33 @@ export default function Topbar({ user }: TopbarProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings/billing" className="cursor-pointer">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Billing
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings/team" className="cursor-pointer">
+                <Users className="mr-2 h-4 w-4" />
+                Team
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-red-600 focus:text-red-600"
+              className="text-red-600 focus:text-red-600 cursor-pointer"
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
               <LogOut className="mr-2 h-4 w-4" />

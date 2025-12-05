@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Modern workspace management platform for teams",
 }
 
-import { ThemeProvider } from "@/components/theme-provider"
+import { Providers } from "@/components/providers"
 
 export default function RootLayout({
   children,
@@ -20,15 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <Providers>
           {children}
           <Toaster />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )
