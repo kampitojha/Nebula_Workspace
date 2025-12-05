@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -33,6 +33,11 @@ interface SidebarProps {
 
 export default function Sidebar({ workspaces }: SidebarProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const workspaceId = searchParams.get("workspace")
+  
+  // Use current workspace from URL, or default to the first one available
+  const activeWorkspaceId = workspaceId || workspaces[0]?.id
 
   return (
     <div className="w-64 border-r bg-muted/40 flex flex-col">
@@ -55,8 +60,13 @@ export default function Sidebar({ workspaces }: SidebarProps) {
       <nav className="flex-1 p-4 space-y-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href
+          // Append workspace ID if available
+          const href = activeWorkspaceId 
+            ? `${item.href}?workspace=${activeWorkspaceId}` 
+            : item.href
+
           return (
-            <Link key={item.name} href={item.href}>
+            <Link key={item.name} href={href}>
               <Button
                 variant={isActive ? "secondary" : "ghost"}
                 className={cn(
@@ -76,7 +86,7 @@ export default function Sidebar({ workspaces }: SidebarProps) {
 
       {/* Settings */}
       <div className="p-4">
-        <Link href="/settings">
+        <Link href={activeWorkspaceId ? `/settings?workspace=${activeWorkspaceId}` : "/settings"}>
           <Button
             variant={pathname === "/settings" ? "secondary" : "ghost"}
             className="w-full justify-start"

@@ -103,12 +103,49 @@ export default function ProjectsPage() {
         </Button>
       </div>
 
+      {/* Summary Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+            <FolderKanban className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{projects.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
+            <FolderKanban className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {projects.reduce((acc, p) => acc + p._count.tasks, 0)}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+            <User className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1</div>
+          </CardContent>
+        </Card>
+      </div>
+
       {projects.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <FolderKanban className="h-16 w-16 text-muted-foreground mb-4" />
+            <div className="bg-primary/10 p-4 rounded-full mb-4">
+              <FolderKanban className="h-10 w-10 text-primary" />
+            </div>
             <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
-            <p className="text-muted-foreground text-center mb-4">Get started by creating your first project</p>
+            <p className="text-muted-foreground text-center mb-6 max-w-sm">
+              Projects help you organize tasks, notes, and team members. Create your first project to get started.
+            </p>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Create Project
@@ -116,29 +153,34 @@ export default function ProjectsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <FolderKanban className="h-8 w-8 text-primary" />
-                    <Badge variant="secondary">{project._count.tasks} tasks</Badge>
-                  </div>
-                  <CardTitle className="mt-4">{project.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {project.description || "No description"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <User className="mr-2 h-4 w-4" />
-                    {project.createdBy.name}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div>
+          <h2 className="text-lg font-semibold mb-4">All Projects</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project) => (
+              <Link key={project.id} href={`/projects/${project.id}`}>
+                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
+                        <FolderKanban className="h-6 w-6 text-primary" />
+                      </div>
+                      <Badge variant="secondary">{project._count.tasks} tasks</Badge>
+                    </div>
+                    <CardTitle className="mt-4">{project.name}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {project.description || "No description provided"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <User className="mr-2 h-4 w-4" />
+                      Created by {project.createdBy.name}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

@@ -130,13 +130,39 @@ export default function NotesPage() {
         </Button>
       </div>
 
+      {/* Summary Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Notes</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{notes.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Projects with Notes</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {new Set(notes.map(n => n.project.name)).size}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {notes.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+            <div className="bg-primary/10 p-4 rounded-full mb-4">
+              <FileText className="h-10 w-10 text-primary" />
+            </div>
             <h3 className="text-lg font-semibold mb-2">No notes yet</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Create your first note to start documenting
+            <p className="text-muted-foreground text-center mb-6 max-w-sm">
+              Capture ideas, meeting minutes, and documentation. Create your first note to get started.
             </p>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
@@ -145,25 +171,36 @@ export default function NotesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {notes.map((note) => (
-            <Link key={note.id} href={`/notes/${note.id}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardHeader>
-                  <CardTitle>{note.title}</CardTitle>
-                  <CardDescription>
-                    Project: {note.project.name}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <User className="mr-2 h-4 w-4" />
-                    {note.createdBy.name}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div>
+          <h2 className="text-lg font-semibold mb-4">All Notes</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {notes.map((note) => (
+              <Link key={note.id} href={`/notes/${note.id}`}>
+                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="bg-primary/10 p-2 rounded-md group-hover:bg-primary/20 transition-colors">
+                        <FileText className="h-6 w-6 text-primary" />
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(note.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <CardTitle className="mt-4 line-clamp-1">{note.title}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      Project: {note.project.name}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <User className="mr-2 h-4 w-4" />
+                      Created by {note.createdBy.name}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

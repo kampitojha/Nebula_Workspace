@@ -113,12 +113,51 @@ export default function TasksPage() {
           New Task
         </Button>
       </div>
+      {/* Summary Stats */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{tasks.length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {tasks.filter((t) => t.status === "DONE").length}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CheckCircle className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {tasks.filter((t) => t.status !== "DONE").length}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {tasks.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <CheckCircle className="h-16 w-16 text-muted-foreground mb-4" />
+            <div className="bg-primary/10 p-4 rounded-full mb-4">
+              <CheckCircle className="h-10 w-10 text-primary" />
+            </div>
             <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
-            <p className="text-muted-foreground text-center mb-4">Create a task to get started</p>
+            <p className="text-muted-foreground text-center mb-6 max-w-sm">
+              Track your work by creating tasks. Assign them to projects and team members.
+            </p>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Create Task
@@ -126,23 +165,44 @@ export default function TasksPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {tasks.map((task) => (
-            <Link key={task.id} href={`/tasks/${task.id}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="mt-4">{task.title}</CardTitle>
-                    <Badge variant="secondary">{task.status}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{task.project.name}</p>
-                  {task.assignee && <p className="text-sm text-muted-foreground">Assignee: {task.assignee.name}</p>}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div>
+          <h2 className="text-lg font-semibold mb-4">All Tasks</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {tasks.map((task) => (
+              <Link key={task.id} href={`/tasks/${task.id}`}>
+                <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer h-full group">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="mt-4 text-lg">{task.title}</CardTitle>
+                      <Badge 
+                        variant={task.status === "DONE" ? "default" : "secondary"}
+                        className={task.status === "DONE" ? "bg-green-500 hover:bg-green-600" : ""}
+                      >
+                        {task.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {task.description || "No description provided"}
+                      </p>
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <span className="text-xs font-medium px-2 py-1 bg-muted rounded-md">
+                          {task.project.name}
+                        </span>
+                        {task.assignee && (
+                          <span className="text-xs text-muted-foreground">
+                            {task.assignee.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
